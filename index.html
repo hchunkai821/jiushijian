@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://xpnzyefimdywjihxvcda.supabase.co wss://xpnzyefimdywjihxvcda.supabase.co; manifest-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="no-referrer">
+<title>揪時間｜手機也好填的多人時間協調</title>
+<meta name="description" content="開一個房間、丟出連結，大家用手機拖一拖就能填好有空的時段，自動排出最多人能到的時間。">
+<meta property="og:title" content="揪時間｜來填你有空的時間">
+<meta property="og:description" content="點開連結、輸入暱稱，在手機上拖一拖就能填好。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://hchunkai821.github.io/jiushijian/">
+<meta property="og:image" content="https://hchunkai821.github.io/jiushijian/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="揪時間：一條連結，大家用手指塗一塗，自動挑出最多人能到的時間">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#F1F5F6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E171A" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://hchunkai821.github.io/jiushijian/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top" id="top">
+  <div class="top-in">
+    <a class="brand" href="./" data-nav aria-label="揪時間首頁"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>揪時間</a>
+    <div class="ev-title" id="evTitle"></div>
+    <button class="btn sm" id="adminBtn" type="button" hidden>主理人</button>
+    <button class="btn sm" id="shareBtn" type="button" hidden>分享</button>
+  </div>
+  <nav class="tabs" id="tabs" role="tablist" hidden>
+    <button class="tab" role="tab" type="button" data-tab="edit">我的時間</button>
+    <button class="tab" role="tab" type="button" data-tab="heat">團體熱力圖<span class="ct" id="ctHeat"></span></button>
+    <button class="tab" role="tab" type="button" data-tab="best">最佳時段</button>
+  </nav>
+</header>
+<main id="main"></main>
+<div class="toolbar" id="toolbar" hidden></div>
+<div class="sheet" id="sheet" hidden></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+.scannerwork/
+.DS_Store
+node_modules/
+coverage/
+tests/.test-env
+test-results/

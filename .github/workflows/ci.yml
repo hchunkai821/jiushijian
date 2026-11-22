@@ -1,0 +1,63 @@
+# 每次 push / PR：跑資料庫資安測試與瀏覽器端對端測試，再用 SonarQube Cloud 檢測品質（含測試覆蓋率）
+# SonarQube 需要 repo secret SONAR_TOKEN（見 README）；沒有設定時只跑測試
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  test-and-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      pull-requests: read
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      # --ignore-scripts：不執行套件自帶的安裝腳本；直接用已鎖定版本的 playwright，不經過 npx
+      - name: Install test tools
+        run: |
+          npm ci --ignore-scripts
+          ./node_modules/.bin/playwright install --with-deps chromium
+      - name: Start test database (Supabase Postgres + PostgREST) and run all migrations
+        run: bash tests/setup-db.sh
+      - name: Run tests
+        run: npm test
+      - name: Stop test database
+        if: always()
+        run: bash tests/setup-db.sh down
+      - name: SonarQube scan + quality gate
+        if: env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@59202af334b4ba7b5db01b701b8e79f8b3bef0f4 # v8.5.0
+        with:
+          args: >
+            -Dsonar.qualitygate.wait=true
+      - name: SONAR_TOKEN missing
+        if: env.SONAR_TOKEN == ''
+        run: echo "::warning::尚未設定 SONAR_TOKEN，只跑了測試，略過 SonarQube 檢測。設定方式見 README。"
+      # 正式資料庫不會隨 push 自動更新：這次有改到 supabase/ 就提醒
+      - name: Remind to apply database changes
+        if: github.event_name == 'push'
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then exit 0; fi
+          changed=$(git diff --name-only "$BEFORE" "$GITHUB_SHA" -- supabase/ 2>/dev/null || true)
+          if [ -n "$changed" ]; then
+            echo "::warning::這次修改了資料庫 SQL（$(echo $changed | tr '\n' ' ')）。正式資料庫不會自動更新，請到 Supabase → SQL Editor 執行新的 migration。"
+          fi

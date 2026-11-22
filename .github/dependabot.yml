@@ -1,0 +1,11 @@
+# 每週檢查 GitHub Actions 與測試工具是否有安全更新
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly

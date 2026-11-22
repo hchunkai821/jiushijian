@@ -1,0 +1,58 @@
+# 部署到 GitHub Pages：只上傳網站需要的檔案（不含 supabase/、README 等開發用檔案）
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - 'SECURITY.md'
+      - 'supabase/**'
+      - 'sonar-project.properties'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.gitignore'
+      - '.github/dependabot.yml'
+      - '.github/workflows/ci.yml'
+  workflow_dispatch:
+
+# 預設不給任何權限，只在需要的 job 開
+permissions: {}
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Collect site files
+        run: |
+          mkdir _site
+          cp index.html app.js config.js styles.css favicon.svg sitemap.xml og.png _site/
+          touch _site/.nojekyll
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
